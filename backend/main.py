@@ -1,61 +1,63 @@
 from flask import request, jsonify
 from config import app, db
-from models import Contact
+from models import City
+from update_data import update_data
 
-@app.route("/contacts", methods=["GET"])
-def get_contacts():
-    contacts = Contact.query.all()
-    json_contacts = list(map(lambda x: x.to_json(), contacts))
-    return jsonify({"contacts": json_contacts})
+@app.route("/cities", methods=["GET"])
+def get_cities():
+    cities = City.query.all()
+    json_cities = list(map(lambda x: x.to_json(), cities))
+    return jsonify({"cities": json_cities})
 
-@app.route("/create_contacts", methods=["POST"])
-def create_contact():
-    first_name = request.json.get("firstName")
-    last_name = request.json.get("lastName")
-    email = request.json.get("email ")
+@app.route("/create_cities", methods=["POST"])
+def create_city():
+    name = request.json.get("name")
+    cost_of_living = request.json.get("costOfLiving")
+    population = request.json.get("population")
 
-    if not first_name or not last_name or not email:
-        jsonify({"messege": "You not include a first name, last name or email"}), 400
+    if not name or not cost_of_living or not population:
+        return jsonify({"message": "You did not include a name, cost of living or population"}), 400
 
-    new_contact = Contact(first_name = first_name, last_name = last_name, email = email)
+    new_city = City(name=name, cost_of_living=cost_of_living, population=population)
     try:
-        db.session.add(new_contact)
+        db.session.add(new_city)
         db.session.commit()
     except Exception as e:
-        return jsonify({"messege": str(e)}), 400
+        return jsonify({"message": str(e)}), 400
 
-    return jsonify({"Messege": "User created!"}), 201
+    return jsonify({"message": "City created!"}), 201
 
-@app.route("/update_contact/<int:user_ud>", methods = ["PATCH"])
-def update_contact(user_id):
-    contact = Contact.query.get(user_id)
+@app.route("/update_city/<int:city_id>", methods=["PATCH"])
+def update_city(city_id):
+    city = City.query.get(city_id)
 
-    if not contact:
-        return jsonify({"messege": "User not found"}), 404
+    if not city:
+        return jsonify({"message": "City not found"}), 404
     
     data = request.json
-    contact.first_name = data.get("firstName", contact.first_name)
-    contact.last_name = data.get("lastName", contact.last_name)
-    contact.email = data.get("email", contact.email)
+    city.name = data.get("name", city.name)
+    city.cost_of_living = data.get("costOfLiving", city.cost_of_living)
+    city.population = data.get("population", city.population)
 
     db.session.commit()
 
-    return jsonify({"messege": "User updated"}), 200
+    return jsonify({"message": "City updated"}), 200
 
-@app.route("/delete_contact/<int:user_id>", methods=["DELETE"])
-def delete_user(user_id):
-    contact = Contact.query.get(user_id)
+@app.route("/delete_city/<int:city_id>", methods=["DELETE"])
+def delete_city(city_id):
+    city = City.query.get(city_id)
 
-    if not contact:
-        return jsonify({"messege": "User not found"}), 404
+    if not city:
+        return jsonify({"message": "City not found"}), 404
     
-    db.session.delete(contact)
+    db.session.delete(city)
     db.session.commit()
 
-    return jsonify({"messege", "User deleted"}), 200
+    return jsonify({"message": "City deleted"}), 200
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-
+        update_data()
+        
     app.run(debug=True)
