@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react'
-import ContactList from './ContactList'
+import CityList from './CityList'
 import './App.css'
 
 function App() {
-  const [contacts, setContacts] = useState([])
+  const [cities, setCities] = useState([])
 
   useEffect(() => {
-    fetchContacts()
+    fetchCities()
   }, [])
   
-  const fetchContacts = async () => {
-    const response = await fetch("http://127.0.0.1:5000/contacts")
+  const fetchCities = async () => {
+    const response = await fetch("http://127.0.0.1:5000/cities")
     const data = await response.json()
-    setContacts(data.contacts)
-    console.log(data.contacts)
+    setCities(data.cities)
+    console.log(data.cities)
   }
 
-  return <ContactList contacts={contacts}/>
+  return <CityList cities={cities}/>
 }
 
 export default App

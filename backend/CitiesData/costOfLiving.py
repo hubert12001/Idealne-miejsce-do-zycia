@@ -55,7 +55,6 @@ def get_cost_of_living(city_name):
 
     
 def update_cost_of_living():
-    """ Aktualizuje koszt życia w bazie danych """
     with db.session.begin():
         cities = City.query.all()
         for city in cities:
