@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from config import db
-from models import City
+from models.city import City
 from unidecode import unidecode
 
 city_mapping = {
