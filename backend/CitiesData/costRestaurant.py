@@ -16,7 +16,8 @@ city_mapping = {
     "Bydgoszcz": "Bydgoszcz",
     "Białystok": "Bialystok"
 }
-def get_cost_of_living(city_name):
+
+def get_restaurant_cost(city_name):
     base_url = "https://www.numbeo.com/cost-of-living/in/"
     formatted_city = city_mapping.get(city_name, unidecode(city_name).replace(" ", "-"))
     url = f"{base_url}{formatted_city}"
@@ -25,16 +26,16 @@ def get_cost_of_living(city_name):
     if response.status_code != 200:
         print(f"Nie udało się pobrać danych dla {city_name}")
         return None
-
+    
     soup = BeautifulSoup(response.text, "html.parser")
 
-    market_table = soup.find("table", {"class": "data_wide_table"})
-    if not market_table:
-        print(f"Nie znaleziono tabeli 'Markets' dla {city_name}")
-        return None
+    restaurant_table = soup.find("table", {"class": "data_wide_table"})
+    if not restaurant_table:
+        print(f"Nie znaleziono tabeli 'Restaurant' dla {city_name}")
+        return None 
 
     prices = []
-    rows = market_table.find_all("tr")[10:29]
+    rows = restaurant_table.find_all("tr")[1:9]
     for row in rows:
         cols = row.find_all("td", {"class": "priceValue"})
         if cols:
@@ -45,21 +46,19 @@ def get_cost_of_living(city_name):
             except ValueError:
                 continue
     if not prices:
-        print(f"Nie udało się znaleźć cen produktów dla {city_name}")
+        print(f"Nie udało się znaleźć cen restauracja dla {city_name}")
         return None
     
-    # Obliczanie średniej
-    avg_cost_of_living = sum(prices) / len(prices)
-    return round(avg_cost_of_living, 2)
+    avg_restaurant_cost = sum(prices) / len(prices)
+    return round(avg_restaurant_cost, 2)
 
-    
-def update_cost_of_living():
+def update_restaurant_cost():
     with db.session.begin():
         cities = City.query.all()
         for city in cities:
-            new_cost = get_cost_of_living(city.name)
+            new_cost = get_restaurant_cost(city.name)
             if new_cost:
-                city.cost_of_living = new_cost
-                print(f"Zaktualizowano {city.name}: {new_cost} PLN")
+                city.restaurant_cost = new_cost
+                print(f"Zaktualizowano restauracje {city.name}: {new_cost} PLN")
 
         db.session.commit()

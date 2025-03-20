@@ -5,6 +5,8 @@ class City(db.Model):
     name = db.Column(db.String(80), nullable=True, unique=True)
     cost_of_living = db.Column(db.Float, nullable=True)
     population = db.Column(db.Integer, nullable=True)
+    salary = db.Column(db.Integer, nullable=True)
+    restaurant_cost = db.Column(db.Integer, nullable=True)
 
     def to_json(self):
         return {

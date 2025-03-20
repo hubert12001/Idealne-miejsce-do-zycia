@@ -10,6 +10,9 @@ def get_cities():
     json_cities = [city.to_json() for city in cities]
     return jsonify({"cities": json_cities})
 
+
+# POST, PATCH, DELETE (Jak narazie nie uzywane)
+"""
 @cities_bp.route("/create_city", methods=["POST"])
 def create_city():
     data = request.json
@@ -56,3 +59,4 @@ def delete_city(city_id):
     db.session.commit()
 
     return jsonify({"message": "City deleted"}), 200
+"""

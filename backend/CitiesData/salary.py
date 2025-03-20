@@ -16,7 +16,8 @@ city_mapping = {
     "Bydgoszcz": "Bydgoszcz",
     "Białystok": "Bialystok"
 }
-def get_cost_of_living(city_name):
+
+def get_salary(city_name):
     base_url = "https://www.numbeo.com/cost-of-living/in/"
     formatted_city = city_mapping.get(city_name, unidecode(city_name).replace(" ", "-"))
     url = f"{base_url}{formatted_city}"
@@ -28,38 +29,33 @@ def get_cost_of_living(city_name):
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    market_table = soup.find("table", {"class": "data_wide_table"})
-    if not market_table:
-        print(f"Nie znaleziono tabeli 'Markets' dla {city_name}")
-        return None
+    salary_table = soup.find("table", {"class": "data_wide_table"})
+    if not salary_table:
+        print(f"Nie znaleziono tabeli salary dla miasta {city_name}")
+        return None  
 
-    prices = []
-    rows = market_table.find_all("tr")[10:29]
+    rows = salary_table.find_all("tr")[63:64]
+    price = None  
+
     for row in rows:
         cols = row.find_all("td", {"class": "priceValue"})
         if cols:
-            price_text = cols[0].text.strip().replace("zł", "").replace(",", ".")
-            try:
-                price = float(price_text)
-                prices.append(price)
-            except ValueError:
-                continue
-    if not prices:
-        print(f"Nie udało się znaleźć cen produktów dla {city_name}")
+            price_text = cols[0].text.strip().replace("zł", "").replace(",", "")
+            price = float(price_text)
+
+    if price is None:
+        print(f"Nie udało się znaleźć zarobków dla {city_name}")
         return None
     
-    # Obliczanie średniej
-    avg_cost_of_living = sum(prices) / len(prices)
-    return round(avg_cost_of_living, 2)
+    return round(price, 2)
 
-    
-def update_cost_of_living():
+
+def update_salary():
     with db.session.begin():
         cities = City.query.all()
         for city in cities:
-            new_cost = get_cost_of_living(city.name)
-            if new_cost:
-                city.cost_of_living = new_cost
-                print(f"Zaktualizowano {city.name}: {new_cost} PLN")
-
-        db.session.commit()
+            new_salary = get_salary(city.name)
+            if new_salary:
+                city.salary = new_salary
+                print("Zaaktualizowano zarobki dla miasta" + city.name)
+    db.session.commit()
