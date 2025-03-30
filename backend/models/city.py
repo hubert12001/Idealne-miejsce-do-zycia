@@ -7,6 +7,7 @@ class City(db.Model):
     population = db.Column(db.Integer, nullable=True)
     salary = db.Column(db.Integer, nullable=True)
     restaurant_cost = db.Column(db.Integer, nullable=True)
+    apartament_rental = db.Column(db.Integer, nullable=True)
 
     def to_json(self):
         return {
