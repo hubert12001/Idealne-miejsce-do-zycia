@@ -58,7 +58,7 @@ def update_restaurant_cost():
         for city in cities:
             new_cost = get_restaurant_cost(city.name)
             if new_cost:
-                city.restaurant_cost = new_cost
+                city.parameters['restaurant_cost'] = new_cost
                 print(f"Zaktualizowano restauracje {city.name}: {new_cost} PLN")
 
         db.session.commit()

@@ -1,15 +1,14 @@
 from config import db
+from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.dialects.sqlite import JSON
 
 class City(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=True, unique=True)
-    cost_of_living = db.Column(db.Float, nullable=True)
-    population = db.Column(db.Integer, nullable=True)
-    salary = db.Column(db.Integer, nullable=True)
-    restaurant_cost = db.Column(db.Integer, nullable=True)
-    apartament_rental = db.Column(db.Integer, nullable=True)
+    parameters = db.Column(MutableDict.as_mutable(JSON), nullable=False, default={})
 
     def to_json(self):
         return {
-            column.name: getattr(self, column.name) for column in self.__table__.columns
+            "miasto": self.name,
+            "parametry": self.parameters
         }

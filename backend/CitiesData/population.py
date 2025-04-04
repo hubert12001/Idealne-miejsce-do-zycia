@@ -10,24 +10,28 @@ def update_population():
     table = soup.find("table", {"class": "wikitable sortable"})
 
     if table:
-        rows = table.find_all("tr")[1:]
+        rows = table.find_all("tr")[1:]  # Pomijamy nagłówek
 
         for row in rows:
             cols = row.find_all("td")
             if len(cols) >= 5:
                 city_name = cols[1].text.strip()
-                population = cols[3].text.strip().replace("\u202f", "").replace(" ", "")
+                population = cols[3].text.strip().replace("\u202f", "").replace(" ", "").replace("\xa0", "")
 
-                # Czy miasto jest już w bazie?
+                try:
+                    population = int(population)
+                except ValueError:
+                    continue  # Pomijamy, jeśli nie da się sparsować
+
                 city = City.query.filter_by(name=city_name).first()
 
                 if city:
-                    # Jeśli istnieje, aktualizujemy populację
-                    city.population = int(population)
+                    # Aktualizujemy tylko parametr "populacja"
+                    city.parameters["populacja"] = population
                 else:
-                    # Jeśli nie istnieje, dodajemy nowe miasto
-                    city = City(name=city_name, population=int(population))
+                    # Tworzymy nowe miasto z parametrem "populacja"
+                    city = City(name=city_name, parameters={"populacja": population})
                     db.session.add(city)
 
-        db.session.commit()  # Zapisujemy zmiany do bazy
+        db.session.commit()
         print("Populacja miast została zaktualizowana!")

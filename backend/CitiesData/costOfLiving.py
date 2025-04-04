@@ -59,7 +59,7 @@ def update_cost_of_living():
         for city in cities:
             new_cost = get_cost_of_living(city.name)
             if new_cost:
-                city.cost_of_living = new_cost
+                city.parameters['cost_of_living'] = new_cost
                 print(f"Zaktualizowano {city.name}: {new_cost} PLN")
 
         db.session.commit()

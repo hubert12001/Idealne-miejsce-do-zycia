@@ -46,7 +46,7 @@ def get_salary(city_name):
     if price is None:
         print(f"Nie udało się znaleźć zarobków dla {city_name}")
         return None
-    
+
     return round(price, 2)
 
 
@@ -56,6 +56,10 @@ def update_salary():
         for city in cities:
             new_salary = get_salary(city.name)
             if new_salary:
-                city.salary = new_salary
-                print("Zaaktualizowano zarobki dla miasta" + city.name)
+                # Odczytujemy aktualne 'parameters' (jeśli istnieje)
+                if city.parameters is None:
+                    city.parameters = {}  # Inicjalizujemy pusty słownik, jeśli brak parametrów
+                # Dodajemy zarobki do parametrów
+                city.parameters['salary'] = new_salary
+                print(f"Zaaktualizowano zarobki dla miasta {city.name}")
     db.session.commit()

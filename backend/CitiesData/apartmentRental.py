@@ -59,7 +59,7 @@ def update_apartament_rental():
         for city in cities:
             new_cost = get_apartament_rental(city.name)
             if new_cost:
-                city.apartament_rental = new_cost
+                city.parameters['apartament_rental'] = new_cost
                 print(f"Zaktualizowano {city.name}: {new_cost} PLN")
 
         db.session.commit()
